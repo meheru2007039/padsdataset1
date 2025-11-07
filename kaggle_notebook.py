@@ -5,6 +5,18 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import math
+import os
+import json
+import csv
+import numpy as np
+import pandas as pd
+from pathlib import Path
+from typing import Dict, List, Tuple, Optional
+from sklearn.metrics import accuracy_score, precision_recall_fscore_support, confusion_matrix, roc_curve, auc
+from sklearn.manifold import TSNE
+import matplotlib.pyplot as plt
+from scipy.signal import butter, filtfilt
+from torch.utils.data import Dataset, DataLoader
 
 class PositionalEncoding(nn.Module):
     def __init__(self, model_dim: int, max_len: int = 5000):
@@ -449,16 +461,6 @@ def plot_tsne(features, hc_pd_labels, pd_dd_labels, output_dir="plots"):
 
     return features_2d
 
-import os
-import json
-import numpy as np
-import torch
-from torch.utils.data import Dataset, DataLoader
-from pathlib import Path
-from typing import Dict, List, Tuple, Optional
-import pandas as pd
-from scipy.signal import butter, filtfilt
-
 
 # ============================================================================
 # Helper functions 
@@ -893,9 +895,7 @@ if __name__ == "__main__":
         break
     
     # Example: Training loop integration
-    
-    from model import MyModel
-    
+
     model = MyModel(
         input_dim=6,
         model_dim=128,
