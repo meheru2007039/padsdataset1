@@ -499,6 +499,7 @@ class PADSDataset(Dataset):
         data_dir: str,
         subject_ids: List[str],
         window_size: int = 256,
+        stride: int = 128,
         classification_task: str = 'hc_vs_pd',
         max_windows_per_task: int = 20,
         skip_initial_samples: int = 50,  # Skip first 0.5s to remove vibration
@@ -512,6 +513,7 @@ class PADSDataset(Dataset):
         self.data_dir = Path(data_dir)
         self.subject_ids = subject_ids
         self.window_size = window_size
+        self.stride = stride
         self.classification_task = classification_task
         self.max_windows_per_task = max_windows_per_task
         self.skip_initial_samples = skip_initial_samples
@@ -656,19 +658,19 @@ class PADSDataset(Dataset):
         
         return windows if windows is not None else np.array([])
     
-    def _create_windows(self, data: np.ndarray, subject_id: str) -> np.ndarray:
+    def _create_windows(self, data: np.ndarray) -> np.ndarray:
         data = data[self.skip_initial_samples:]
-        
+
         n_samples = len(data)
         if n_samples < self.window_size:
             return np.array([])
-        
+
         windows = []
         for start_idx in range(0, n_samples - self.window_size + 1, self.stride):
             end_idx = start_idx + self.window_size
             window = data[start_idx:end_idx]
             windows.append(window)
-        
+
         return np.array(windows)
     
     def __len__(self) -> int:
