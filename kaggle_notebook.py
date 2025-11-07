@@ -912,24 +912,45 @@ if __name__ == "__main__":
     
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
-    
+
+    print(f"\n{'='*60}")
+    print(f"Starting training for {num_epochs} epochs...")
+    print(f"Classification task: {classification_task}")
+    print(f"Device: {device}")
+    print(f"{'='*60}\n")
+
     for epoch in range(num_epochs):
         model.train()
-        for batch in train_loader:
+        epoch_loss = 0.0
+        num_batches = 0
+
+        for batch_idx, batch in enumerate(train_loader):
             # Move to device
-            batch = {k: v.to(device) if isinstance(v, torch.Tensor) else v 
+            batch = {k: v.to(device) if isinstance(v, torch.Tensor) else v
                      for k, v in batch.items()}
-            
+
             # Forward pass
             logits_hc_vs_pd, logits_pd_vs_dd = model(batch)
-            
+
             # Compute loss (choose based on classification_task)
             if classification_task == 'hc_vs_pd':
                 loss = criterion(logits_hc_vs_pd, batch['label_hc_vs_pd'])
             else:
                 loss = criterion(logits_pd_vs_dd, batch['label_pd_vs_dd'])
-            
+
             # Backward pass
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+
+            # Track loss
+            epoch_loss += loss.item()
+            num_batches += 1
+
+            # Print progress every 10 batches
+            if (batch_idx + 1) % 10 == 0:
+                print(f"Epoch [{epoch+1}/{num_epochs}] Batch [{batch_idx+1}/{len(train_loader)}] Loss: {loss.item():.4f}")
+
+        # Print epoch summary
+        avg_loss = epoch_loss / num_batches
+        print(f"\n>>> Epoch [{epoch+1}/{num_epochs}] Complete - Average Loss: {avg_loss:.4f}\n")
