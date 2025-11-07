@@ -869,13 +869,15 @@ def create_dataloaders(
 if __name__ == "__main__":
     # Example: Create dataloaders
     data_dir = "/kaggle/input/parkinsons/pads-parkinsons-disease-smartwatch-dataset-1.0.0"
-    
+    classification_task = 'hc_vs_pd'
+    num_epochs = 10
+
     train_loader, val_loader, test_loader = create_dataloaders(
         data_dir=data_dir,
         batch_size=8,
         window_size=256,
         stride=128,
-        classification_task='hc_vs_pd',
+        classification_task=classification_task,
         num_workers=4
     )
     
