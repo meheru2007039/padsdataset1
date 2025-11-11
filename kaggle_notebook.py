@@ -913,6 +913,9 @@ if __name__ == "__main__":
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 
+    # Track training losses
+    train_losses = []
+
     print(f"\n{'='*60}")
     print(f"Starting training for {num_epochs} epochs...")
     print(f"Classification task: {classification_task}")
@@ -953,4 +956,28 @@ if __name__ == "__main__":
 
         # Print epoch summary
         avg_loss = epoch_loss / num_batches
+        train_losses.append(avg_loss)
         print(f"\n>>> Epoch [{epoch+1}/{num_epochs}] Complete - Average Loss: {avg_loss:.4f}\n")
+
+    # Plot training loss curve
+    print(f"\n{'='*60}")
+    print("Training Complete! Generating loss plot...")
+    print(f"{'='*60}\n")
+
+    os.makedirs("plots", exist_ok=True)
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(range(1, num_epochs + 1), train_losses, marker='o', linewidth=2, markersize=6, color='#2E86AB')
+    plt.xlabel('Epoch', fontsize=12, fontweight='bold')
+    plt.ylabel('Average Loss', fontsize=12, fontweight='bold')
+    plt.title(f'Training Loss Curve - {classification_task.upper()}', fontsize=14, fontweight='bold')
+    plt.grid(True, alpha=0.3, linestyle='--')
+    plt.tight_layout()
+
+    loss_plot_path = f"plots/training_loss_{classification_task}.png"
+    plt.savefig(loss_plot_path, dpi=300, bbox_inches='tight')
+    plt.close()
+
+    print(f"✓ Loss plot saved: {loss_plot_path}")
+    print(f"Final training loss: {train_losses[-1]:.4f}")
+    print(f"Best training loss: {min(train_losses):.4f} (Epoch {train_losses.index(min(train_losses)) + 1})")
